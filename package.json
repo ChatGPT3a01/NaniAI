@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@vercel/blob": "^2.2.0",
     "better-sqlite3": "^12.6.2",
     "docx": "^9.5.1",
     "file-saver": "^2.0.5",

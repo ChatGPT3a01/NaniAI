@@ -13,6 +13,7 @@ import {
   Plus,
   X,
 } from "lucide-react";
+import { upload } from "@vercel/blob/client";
 import { cn } from "@/lib/utils";
 
 interface SubjectItem {
@@ -219,20 +220,55 @@ export default function AdminPage() {
     setMessage(null);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("title", title);
-      formData.append("subject", subject);
-      formData.append("grade", grade);
+      let blobUrl: string | null = null;
 
-      const res = await fetch("/api/books", {
-        method: "POST",
-        body: formData,
-      });
+      // 嘗試客戶端直接上傳到 Vercel Blob
+      try {
+        const blob = await upload(file.name, file, {
+          access: "public",
+          handleUploadUrl: "/api/upload",
+        });
+        blobUrl = blob.url;
+      } catch {
+        // Blob 不可用（本地開發沒有 token），走 FormData
+        blobUrl = null;
+      }
 
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "上傳失敗");
+      if (blobUrl) {
+        // Blob 模式：只傳 metadata + blob URL
+        const res = await fetch("/api/books", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title,
+            subject,
+            grade,
+            blobUrl,
+            originalFilename: file.name,
+          }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || "上傳失敗");
+        }
+      } else {
+        // 本地 fallback：走 FormData
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("title", title);
+        formData.append("subject", subject);
+        formData.append("grade", grade);
+
+        const res = await fetch("/api/books", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || "上傳失敗");
+        }
       }
 
       setMessage({ type: "success", text: "教科書上傳成功！" });

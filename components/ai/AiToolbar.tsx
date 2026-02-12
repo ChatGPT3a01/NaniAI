@@ -27,12 +27,14 @@ interface AiToolbarProps {
   bookId: string;
   selectedPages: [number, number];
   bookFilename: string;
+  bookFileUrl: string;
 }
 
 export default function AiToolbar({
   bookId,
   selectedPages,
   bookFilename,
+  bookFileUrl,
 }: AiToolbarProps) {
   const [activeTool, setActiveTool] = useState<Tool | null>(null);
   const hasSelection = selectedPages[0] > 0;
@@ -97,6 +99,7 @@ export default function AiToolbar({
             bookId={bookId}
             selectedPages={selectedPages}
             bookFilename={bookFilename}
+            bookFileUrl={bookFileUrl}
             getHeaders={getAiHeaders}
           />
         )}
@@ -105,6 +108,7 @@ export default function AiToolbar({
             bookId={bookId}
             selectedPages={selectedPages}
             bookFilename={bookFilename}
+            bookFileUrl={bookFileUrl}
             getHeaders={getAiHeaders}
           />
         )}
@@ -113,6 +117,7 @@ export default function AiToolbar({
             bookId={bookId}
             selectedPages={selectedPages}
             bookFilename={bookFilename}
+            bookFileUrl={bookFileUrl}
             getHeaders={getAiHeaders}
           />
         )}
@@ -121,6 +126,7 @@ export default function AiToolbar({
             bookId={bookId}
             selectedPages={selectedPages}
             bookFilename={bookFilename}
+            bookFileUrl={bookFileUrl}
             getHeaders={getAiHeaders}
           />
         )}

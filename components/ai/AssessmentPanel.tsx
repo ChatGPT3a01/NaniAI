@@ -25,6 +25,7 @@ interface Props {
   bookId: string;
   selectedPages: [number, number];
   bookFilename: string;
+  bookFileUrl: string;
   getHeaders: () => Record<string, string>;
 }
 
@@ -36,7 +37,7 @@ const DIFFICULTIES: { id: Difficulty; label: string; color: string }[] = [
 
 export default function AssessmentPanel({
   selectedPages,
-  bookFilename,
+  bookFileUrl,
   getHeaders,
 }: Props) {
   const [difficulty, setDifficulty] = useState<Difficulty>("basic");
@@ -61,7 +62,7 @@ export default function AssessmentPanel({
         method: "POST",
         headers: { "Content-Type": "application/json", ...headers },
         body: JSON.stringify({
-          filename: bookFilename,
+          fileUrl: bookFileUrl,
           startPage: selectedPages[0],
           endPage: selectedPages[1],
           difficulty,

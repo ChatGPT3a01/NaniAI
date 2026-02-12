@@ -1,18 +1,14 @@
-import fs from "fs";
-import path from "path";
-
-const UPLOADS_DIR = path.join(process.cwd(), "public", "uploads");
+import { readFile } from "@/lib/storage";
 
 export async function extractTextFromPdf(
-  filename: string,
+  fileUrl: string,
   startPage: number,
   endPage: number
 ): Promise<string> {
-  // Dynamic import to avoid SSR issues
   const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs");
 
-  const filePath = path.join(UPLOADS_DIR, filename);
-  const dataBuffer = new Uint8Array(fs.readFileSync(filePath));
+  const buffer = await readFile(fileUrl);
+  const dataBuffer = new Uint8Array(buffer);
 
   const doc = await pdfjsLib.getDocument({ data: dataBuffer }).promise;
 
@@ -32,11 +28,11 @@ export async function extractTextFromPdf(
   return pages.join("\n\n--- 頁面分隔 ---\n\n").trim();
 }
 
-export async function getPdfPageCount(filename: string): Promise<number> {
+export async function getPdfPageCount(fileUrl: string): Promise<number> {
   const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs");
 
-  const filePath = path.join(UPLOADS_DIR, filename);
-  const dataBuffer = new Uint8Array(fs.readFileSync(filePath));
+  const buffer = await readFile(fileUrl);
+  const dataBuffer = new Uint8Array(buffer);
 
   const doc = await pdfjsLib.getDocument({ data: dataBuffer }).promise;
   const numPages = doc.numPages;

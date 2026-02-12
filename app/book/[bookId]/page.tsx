@@ -12,6 +12,7 @@ interface Book {
   subject: string;
   grade: string;
   filename: string;
+  blob_url: string | null;
   total_pages: number;
 }
 
@@ -75,7 +76,7 @@ export default function BookPage({
         {/* Left: PDF Viewer */}
         <div className="flex-1 border-r border-border">
           <PdfViewer
-            fileUrl={`/uploads/${book.filename}`}
+            fileUrl={book.blob_url || `/uploads/${book.filename}`}
             totalPages={book.total_pages}
             selectedPages={selectedPages}
             onSelectPages={setSelectedPages}
@@ -88,6 +89,7 @@ export default function BookPage({
             bookId={book.id}
             selectedPages={selectedPages}
             bookFilename={book.filename}
+            bookFileUrl={book.blob_url || `/uploads/${book.filename}`}
           />
         </div>
       </div>

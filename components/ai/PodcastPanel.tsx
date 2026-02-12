@@ -25,6 +25,7 @@ interface Props {
   bookId: string;
   selectedPages: [number, number];
   bookFilename: string;
+  bookFileUrl: string;
   getHeaders: () => Record<string, string>;
 }
 
@@ -38,7 +39,7 @@ const SEGMENT_ICONS: Record<string, string> = {
 
 export default function PodcastPanel({
   selectedPages,
-  bookFilename,
+  bookFileUrl,
   getHeaders,
 }: Props) {
   const [generating, setGenerating] = useState(false);
@@ -65,7 +66,7 @@ export default function PodcastPanel({
         method: "POST",
         headers: { "Content-Type": "application/json", ...headers },
         body: JSON.stringify({
-          filename: bookFilename,
+          fileUrl: bookFileUrl,
           startPage: selectedPages[0],
           endPage: selectedPages[1],
           generateAudio,

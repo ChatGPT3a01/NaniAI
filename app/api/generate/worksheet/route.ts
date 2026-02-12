@@ -10,13 +10,14 @@ import {
 export async function POST(request: NextRequest) {
   try {
     const config = getApiConfig(request.headers);
-    const { filename, startPage, endPage } = await request.json();
+    const { fileUrl, filename, startPage, endPage } = await request.json();
+    const pdfRef = fileUrl || filename;
 
-    if (!filename || !startPage || !endPage) {
+    if (!pdfRef || !startPage || !endPage) {
       return NextResponse.json({ error: "缺少必要參數" }, { status: 400 });
     }
 
-    const text = await extractTextFromPdf(filename, startPage, endPage);
+    const text = await extractTextFromPdf(pdfRef, startPage, endPage);
     if (!text.trim()) {
       return NextResponse.json(
         { error: "無法從選取頁面擷取文字" },

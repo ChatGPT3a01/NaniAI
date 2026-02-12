@@ -30,10 +30,18 @@ function initTables(db: Database.Database) {
       subject TEXT,
       grade TEXT,
       filename TEXT NOT NULL,
+      blob_url TEXT,
       total_pages INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  // Migration: 為既有資料庫新增 blob_url 欄位
+  try {
+    db.exec("ALTER TABLE books ADD COLUMN blob_url TEXT");
+  } catch {
+    // 欄位已存在，忽略
+  }
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS settings (

@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import fs from "fs";
-import path from "path";
+import { deleteFile } from "@/lib/storage";
 
-const UPLOADS_DIR = path.join(process.cwd(), "public", "uploads");
+interface BookRow {
+  id: string;
+  filename: string;
+  blob_url: string | null;
+}
 
 export async function GET(
   _request: NextRequest,
@@ -32,21 +35,19 @@ export async function DELETE(
   try {
     const { bookId } = await params;
     const db = getDb();
-    const book = db.prepare("SELECT * FROM books WHERE id = ?").get(bookId) as {
-      filename: string;
-    } | undefined;
+    const book = db.prepare("SELECT * FROM books WHERE id = ?").get(bookId) as
+      | BookRow
+      | undefined;
 
     if (!book) {
       return NextResponse.json({ error: "找不到此書籍" }, { status: 404 });
     }
 
-    // Delete file
-    const filePath = path.join(UPLOADS_DIR, book.filename);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
+    // 刪除檔案：優先使用 blob_url，fallback 到 filename
+    const fileRef = book.blob_url || book.filename;
+    await deleteFile(fileRef);
 
-    // Delete from database
+    // 刪除資料庫記錄
     db.prepare("DELETE FROM books WHERE id = ?").run(bookId);
 
     return NextResponse.json({ success: true });
